@@ -58,3 +58,7 @@ A mutação do HTT age por ganho de função tóxico (remover o HTT testa a depe
 - STRING v12 (Szklarczyk et al., 2023), dados sob CC BY 4.0.
 - GeneReviews: Huntington disease (Caron et al.).
 - Medina et al. 2022 (prevalência).
+
+## Licença e como citar
+
+Código, dados processados, figuras e texto estão sob a licença MIT (arquivo `LICENSE`). Ao reutilizar qualquer parte, mantenha o aviso de copyright e credite os autores: Vinícius Massaru Oliveira Tanaka e Marcos Vinícius Magalhães Alves (UNIFESP, Introdução à Biologia de Sistemas, 2026). Os dados de interação vêm do STRING e do KEGG, que têm termos próprios de uso.
