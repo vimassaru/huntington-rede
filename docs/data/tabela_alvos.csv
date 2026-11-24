@@ -1,0 +1,11 @@
+no,modulo,grau,betweenness,ponto_articulacao,dEficiencia_%,LCC_apos_remocao,cascata_phi0.3,modulos_atingidos_phi0.3
+SLC1A2,Astrócitos,7,0.1744,True,11.47,59,7,1
+PPARGC1A,Mitocôndria/estresse oxidativo,13,0.1612,True,10.96,61,5,1
+HTT,HTT,17,0.3987,True,9.12,64,3,3
+TP53,Apoptose,18,0.2,False,4.07,65,1,1
+MTOR,Autofagia,14,0.0863,False,1.91,65,3,2
+HDAC1,Transcrição,11,0.1159,False,1.71,65,10,1
+DCTN1,Transporte intracelular,9,0.1066,False,1.54,65,8,1
+BECN1,Autofagia,15,0.0737,False,1.49,65,1,1
+PIK3C3,Autofagia,13,0.0462,False,1.29,65,1,1
+BAX,Apoptose,13,0.0599,False,1.22,65,66,8

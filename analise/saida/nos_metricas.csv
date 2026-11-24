@@ -1,0 +1,67 @@
+no,modulo,grau,betweenness,ponto_articulacao,dEficiencia_%,LCC_apos_remocao,cascata_phi0.3,modulos_atingidos_phi0.3
+SLC1A2,Astrócitos,7,0.1744,True,11.47,59,7,1
+PPARGC1A,Mitocôndria/estresse oxidativo,13,0.1612,True,10.96,61,5,1
+HTT,HTT,17,0.3987,True,9.12,64,3,3
+TP53,Apoptose,18,0.2,False,4.07,65,1,1
+MTOR,Autofagia,14,0.0863,False,1.91,65,3,2
+HDAC1,Transcrição,11,0.1159,False,1.71,65,10,1
+DCTN1,Transporte intracelular,9,0.1066,False,1.54,65,8,1
+BECN1,Autofagia,15,0.0737,False,1.49,65,1,1
+PIK3C3,Autofagia,13,0.0462,False,1.29,65,1,1
+BAX,Apoptose,13,0.0599,False,1.22,65,66,8
+KCNJ10,Astrócitos,3,0.0308,True,1.15,64,2,1
+SLC6A11,Astrócitos,3,0.0308,True,1.15,64,2,1
+CASP3,Apoptose,12,0.0453,False,1.1,65,2,2
+SOD1,Mitocôndria/estresse oxidativo,7,0.0573,False,0.97,65,1,1
+ITPR1,Sinalização de cálcio,8,0.065,False,0.97,65,1,1
+CREBBP,Transcrição,6,0.048,False,0.94,65,1,1
+DLG4,Sinalização de cálcio,7,0.0594,False,0.82,65,1,1
+ULK1,Autofagia,11,0.0235,False,0.74,65,1,1
+REST,Transcrição,5,0.0379,False,0.53,65,1,1
+BECN2,Autofagia,9,0.0162,False,0.5,65,1,1
+CASP9,Apoptose,6,0.0019,False,0.27,65,1,1
+GPX5,Mitocôndria/estresse oxidativo,6,0.0061,False,0.24,65,1,1
+GPX6,Mitocôndria/estresse oxidativo,6,0.0061,False,0.24,65,1,1
+SIN3A,Transcrição,8,0.0357,False,0.24,65,1,1
+CAMK2D,Sinalização de cálcio,5,0.0233,False,0.23,65,1,1
+SOD2,Mitocôndria/estresse oxidativo,5,0.0012,False,0.18,65,1,1
+ATG14,Autofagia,9,0.001,False,0.16,65,1,1
+BCL2L2,Apoptose,8,0.0107,False,0.16,65,3,1
+BID,Apoptose,7,0.0059,False,0.12,65,2,1
+ULK2,Autofagia,8,0.0005,False,0.1,65,1,1
+ATG101,Autofagia,8,0.0005,False,0.1,65,1,1
+HAP1,Transporte intracelular,5,0.0345,False,0.09,65,1,1
+BAD,Apoptose,6,0.0004,False,0.06,65,1,1
+BBC3,Apoptose,5,0.0,False,-0.01,65,1,1
+KLC4,Transporte intracelular,3,0.0133,False,-0.04,65,2,1
+NRBF2,Autofagia,7,0.0,False,-0.04,65,1,1
+HIP1,Transporte intracelular,2,0.0,False,-0.05,65,1,1
+RUBCN,Autofagia,5,0.0,False,-0.07,65,1,1
+PLCB1,Sinalização de cálcio,5,0.0066,False,-0.08,65,1,1
+GRM1,Sinalização de cálcio,8,0.0064,False,-0.09,65,1,1
+GRM5,Sinalização de cálcio,7,0.0057,False,-0.22,65,1,1
+RCOR1,Transcrição,6,0.0068,False,-0.24,65,3,1
+STX1A,Sinalização de cálcio,1,0.0,False,-0.27,65,1,1
+HOMER2,Sinalização de cálcio,6,0.0004,False,-0.3,65,1,1
+HOMER3,Sinalização de cálcio,6,0.0004,False,-0.3,65,1,1
+HOMER1,Sinalização de cálcio,6,0.0004,False,-0.3,65,1,1
+GABPB1,Mitocôndria/estresse oxidativo,3,0.0,False,-0.35,65,3,1
+NRF1,Mitocôndria/estresse oxidativo,3,0.0,False,-0.35,65,3,1
+TFAM,Mitocôndria/estresse oxidativo,3,0.0,False,-0.35,65,3,1
+UCP3,Mitocôndria/estresse oxidativo,1,0.0,False,-0.47,65,1,1
+SAP30,Transcrição,5,0.0003,False,-0.48,65,1,1
+BRMS1,Transcrição,4,0.0,False,-0.53,65,1,1
+SLC1A3,Astrócitos,4,0.0019,False,-0.53,65,7,1
+SAP30L,Transcrição,4,0.0,False,-0.53,65,1,1
+DCTN4,Transporte intracelular,5,0.0003,False,-0.54,65,8,1
+DCTN6,Transporte intracelular,5,0.0003,False,-0.54,65,8,1
+HRK,Apoptose,3,0.0,False,-0.54,65,1,1
+RTL10,Apoptose,2,0.0,False,-0.6,65,1,1
+DCTN5,Transporte intracelular,4,0.0,False,-0.6,65,1,1
+KIF5A,Transporte intracelular,2,0.0,False,-0.61,65,2,1
+GSE1,Transcrição,2,0.0,False,-0.65,65,1,1
+BMERB1,Transporte intracelular,3,0.0,False,-0.65,65,1,1
+PHF21B,Transcrição,2,0.0,False,-0.65,65,1,1
+ALDH1L1,Astrócitos,2,0.0,False,-0.69,65,1,1
+SLC6A13,Astrócitos,1,0.0,False,-1.24,65,2,1
+MLC1,Astrócitos,1,0.0,False,-1.24,65,2,1

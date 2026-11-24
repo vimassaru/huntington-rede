@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Huntington como rede: explorador interativo</title>
+<meta name="description" content="Rede de interação proteica do gene HTT na Doença de Huntington: hubs, robustez, cascatas, estratégia de proteção e propriedades small-world. Projeto de Introdução à Biologia de Sistemas (UNIFESP).">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">Huntington como rede <span>Introdução à Biologia de Sistemas · UNIFESP</span></div>
+    <nav id="nav">
+      <a href="#visao" class="on">Visão geral</a>
+      <a href="#rede">Explorar a rede</a>
+      <a href="#ataque">Robustez</a>
+      <a href="#cascata">Cascata</a>
+      <a href="#protecao">Solução</a>
+      <a href="#smallworld">Small-world</a>
+      <a href="#metodo">Método e código</a>
+      <a href="#conceitos">Conceitos</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ VISÃO GERAL ============ -->
+<section id="visao" class="hero">
+  <h1>Uma doença, vários sistemas: o que a rede de proteínas do HTT revela</h1>
+  <p class="lead">A Doença de Huntington é causada por repetições CAG no gene <b>HTT</b>, mas a huntingtina participa de transporte, transcrição, cálcio, mitocôndria, morte celular e autofagia ao mesmo tempo. Em vez de olhar uma proteína por vez, montamos a <b>rede de interações</b> entre elas e usamos ferramentas de biologia de sistemas para perguntar: <i>quem sustenta essa rede, o que acontece se cair e o que vale proteger?</i></p>
+  <div class="cards" id="numeros"></div>
+  <div class="flow">
+    <div><b>1. Sistema biológico</b><br>7 mecanismos do mapa KEGG</div><i>→</i>
+    <div><b>2. Rede</b><br>nó = proteína · aresta = interação (STRING ≥ 0,7)</div><i>→</i>
+    <div><b>3. Métricas</b><br>hubs, pontes, módulos, small-world</div><i>→</i>
+    <div><b>4. Perturbação</b><br>remover nós · cascata de falhas</div><i>→</i>
+    <div><b>5. Intervenção</b><br>qual núcleo proteger?</div>
+  </div>
+  <p class="aviso">Este é um exercício computacional que prioriza hipóteses. Não é tratamento, e não houve validação experimental. As limitações estão na seção <a href="#conceitos">Conceitos e limites</a>.</p>
+</section>
+
+<!-- ============ EXPLORAR ============ -->
+<section id="rede">
+  <h2>Explorar a rede</h2>
+  <p class="sec">Clique em uma proteína para ver suas métricas e o papel fisiológico. Cada cor é um módulo funcional do KEGG.</p>
+  <div class="panel">
+    <div class="graph">
+      <svg id="svgRede" viewBox="0 0 900 620"></svg>
+      <div class="legend" id="legModulos"></div>
+    </div>
+    <aside>
+      <div class="ctrl">
+        <label>Colorir por
+          <select id="rColor"><option value="modulo">Módulo funcional</option><option value="dEf">Impacto da remoção (perda de eficiência)</option></select>
+        </label>
+        <label>Tamanho por
+          <select id="rSize"><option value="grau">Grau (nº de conexões)</option><option value="btw">Betweenness (pontes)</option></select>
+        </label>
+        <label>Buscar proteína <input id="rBusca" placeholder="ex.: SLC1A2" list="listaNos"></label>
+        <datalist id="listaNos"></datalist>
+        <button id="rFisica" class="btn">Reorganizar com física</button>
+        <button id="rReset" class="btn ghost">Layout do Cytoscape</button>
+      </div>
+      <div id="infoNo" class="info"><b>Nenhuma proteína selecionada.</b><br>Dica: SLC1A2 tem só 7 conexões mas é a 3ª maior betweenness.</div>
+    </aside>
+  </div>
+  <div class="tablewrap"><table id="tabModulos"></table></div>
+</section>
+
+<!-- ============ ROBUSTEZ ============ -->
+<section id="ataque">
+  <h2>Robustez: o que acontece se removermos proteínas?</h2>
+  <p class="sec">Escolha uma estratégia e remova nós. A rede <b>aguenta falhas ao acaso</b>, mas se desfaz quando as <b>pontes</b> são atingidas. Você também pode clicar nos nós para removê-los manualmente.</p>
+  <div class="panel">
+    <div class="graph"><svg id="svgAtaque" viewBox="0 0 900 620"></svg></div>
+    <aside>
+      <div class="ctrl">
+        <label>Estratégia
+          <select id="aEstrat">
+            <option value="random">Ao acaso</option>
+            <option value="grau">Maior grau primeiro</option>
+            <option value="btw">Maior betweenness primeiro</option>
+            <option value="manual">Manual (clique nos nós)</option>
+          </select>
+        </label>
+        <label>Nós removidos: <b id="aKv">0</b>
+          <input type="range" id="aK" min="0" max="30" value="0">
+        </label>
+        <button id="aSort" class="btn ghost">Sortear de novo</button>
+        <button id="aZera" class="btn ghost">Zerar</button>
+      </div>
+      <div class="stats">
+        <div><span id="aLcc">100%</span><small>da rede ainda conectada (maior componente)</small></div>
+        <div><span id="aEff">100%</span><small>da eficiência de comunicação (relativa à rede inteira)</small></div>
+      </div>
+    </aside>
+  </div>
+  <div class="chartbox"><h3>Curvas de ataque (calculadas aqui no navegador)</h3><svg id="chAtaque" viewBox="0 0 900 320"></svg>
+    <p class="nota">Linha cinza: média de 200 remoções ao acaso. A bolinha marca o ponto atual. Metade da rede se separa com poucos ataques dirigidos, mas exige muitos sorteios ao acaso.</p></div>
+</section>
+
+<!-- ============ CASCATA ============ -->
+<section id="cascata">
+  <h2>Cascata de falhas</h2>
+  <p class="sec">Modelo de limiar: uma proteína falha quando a fração φ dos seus vizinhos já falhou. Escolha a semente clicando em um nó e veja a falha se espalhar rodada a rodada.</p>
+  <div class="panel">
+    <div class="graph"><svg id="svgCasc" viewBox="0 0 900 620"></svg></div>
+    <aside>
+      <div class="ctrl">
+        <label>Limiar φ: <b id="cPhiV">0,20</b>
+          <input type="range" id="cPhi" min="0.1" max="0.6" step="0.05" value="0.2"></label>
+        <label>Semente (primeira a falhar) <input id="cSeed" list="listaNos" value="HTT"></label>
+        <button id="cRun" class="btn">▶ Rodar cascata</button>
+        <button id="cWorst" class="btn ghost">Pior semente para esse φ</button>
+      </div>
+      <div class="stats">
+        <div><span id="cTam">–</span><small>proteínas falharam (de 66)</small></div>
+        <div><span id="cMed">–</span><small>média sobre todas as sementes</small></div>
+        <div><span id="cMod">–</span><small>módulos atingidos</small></div>
+      </div>
+      <p class="nota" id="cTexto"></p>
+    </aside>
+  </div>
+  <div class="chartbox"><h3>Fragilidade em função de φ</h3><svg id="chPhi" viewBox="0 0 900 300"></svg>
+    <p class="nota">Média de nós que falham ao iniciar a cascata em cada proteína. Há uma faixa estreita em que a rede passa de estável a frágil, e o valor de φ é uma <b>suposição do modelo</b>.</p></div>
+</section>
+
+<!-- ============ PROTEÇÃO ============ -->
+<section id="protecao">
+  <h2>Solução inovadora: proteger o núcleo crítico</h2>
+  <p class="sec">Em vez de perguntar o que cai, perguntamos <b>o que proteger</b>. Uma proteína “protegida” mantém sua função e não pode falhar. Marque nós para proteger (clique) ou use uma estratégia pronta e veja a média da cascata cair.</p>
+  <div class="panel">
+    <div class="graph"><svg id="svgProt" viewBox="0 0 900 620"></svg></div>
+    <aside>
+      <div class="ctrl">
+        <label>Limiar φ: <b id="pPhiV">0,20</b>
+          <input type="range" id="pPhi" min="0.1" max="0.5" step="0.05" value="0.2"></label>
+        <label>Quantas proteger (k): <b id="pKv">5</b>
+          <input type="range" id="pK" min="0" max="10" value="5"></label>
+        <label>Estratégia
+          <select id="pEstrat">
+            <option value="grau">Maiores hubs (grau)</option>
+            <option value="btw">Maior betweenness</option>
+            <option value="gulosa">Escolha gulosa (otimizada)</option>
+            <option value="random">Aleatória</option>
+            <option value="manual">Manual (clique nos nós)</option>
+          </select>
+        </label>
+        <button id="pLimpa" class="btn ghost">Limpar proteção</button>
+      </div>
+      <div class="stats">
+        <div><span id="pBase">–</span><small>média de nós que falham sem proteção</small></div>
+        <div><span id="pAgora">–</span><small>média com a proteção escolhida</small></div>
+        <div class="destaque"><span id="pRed">–</span><small>redução da cascata</small></div>
+      </div>
+      <p class="nota" id="pLista"></p>
+    </aside>
+  </div>
+  <div class="chartbox"><h3>Comparação de estratégias (k de 0 a 10, φ escolhido)</h3><svg id="chProt" viewBox="0 0 900 340"></svg>
+    <p class="nota">Reproduz o experimento do relatório com φ = 0,2: proteger 5 hubs reduz a cascata em 66%, contra 17% com 5 proteínas sorteadas. A escolha gulosa testa proteína por proteína. Biologicamente é uma <b>hipótese de prioridade de alvos</b>: preservar a mitocôndria (PPARGC1A), a captação de glutamato (SLC1A2) e a autofagia (MTOR, BECN1).</p></div>
+</section>
+
+<!-- ============ SMALL WORLD ============ -->
+<section id="smallworld">
+  <h2>Mundo pequeno (small-world) e livre de escala</h2>
+  <p class="sec">Duas propriedades clássicas de redes biológicas. Calculamos para a nossa rede e comparamos com redes aleatórias do mesmo tamanho.</p>
+
+  <div class="two">
+    <div class="box">
+      <h3>A rede do HTT é small-world?</h3>
+      <div id="swTabela"></div>
+      <p class="nota">Small-world significa agrupamento alto (C ≫ C<sub>aleatória</sub>) com caminhos curtos (L ≈ L<sub>aleatória</sub>). O índice σ = (C/C<sub>rand</sub>) / (L/L<sub>rand</sub>) acima de 1 indica small-world. Aqui <b id="swSigma"></b>.</p>
+    </div>
+    <div class="box">
+      <h3>Distribuição de graus</h3>
+      <div class="ctrl inline"><label><input type="checkbox" id="dLog"> escala log-log</label></div>
+      <svg id="chGrau" viewBox="0 0 450 300"></svg>
+      <p class="nota" id="swEscala"></p>
+    </div>
+  </div>
+
+  <div class="box">
+    <h3>Laboratório: de rede regular a aleatória (modelo de Watts–Strogatz)</h3>
+    <p class="nota">Comece com um anel em que cada nó se liga aos vizinhos próximos: muito agrupado, mas com caminhos longos. Ao religar poucas arestas ao acaso, os caminhos encurtam muito rápido, enquanto o agrupamento quase não cai. Essa é a zona small-world.</p>
+    <div class="two">
+      <div>
+        <label>Probabilidade de religação p: <b id="wsPv">0,00</b>
+          <input type="range" id="wsP" min="0" max="100" value="0"></label>
+        <svg id="svgWS" viewBox="0 0 420 420"></svg>
+        <div class="stats mini">
+          <div><span id="wsC">–</span><small>C(p)/C(0): agrupamento</small></div>
+          <div><span id="wsL">–</span><small>L(p)/L(0): caminho médio</small></div>
+        </div>
+      </div>
+      <div><svg id="chWS" viewBox="0 0 460 340"></svg>
+        <p class="nota">Cada ponto é a média de 8 redes de 100 nós (grau médio 6), geradas agora no seu navegador. O eixo horizontal é logarítmico.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MÉTODO ============ -->
+<section id="metodo">
+  <h2>Como chegamos a essa conclusão</h2>
+  <p class="sec">Todo o caminho é reproduzível: dos dados brutos do STRING até as figuras. Os scripts, as tabelas e o relatório estão no repositório.</p>
+  <ol class="passos">
+    <li><b>Dados.</b> As proteínas vêm do mapa KEGG <i>hsa05016</i> (7 grupos funcionais). Cada grupo foi consultado no STRING (humano), com expansão de uma camada, e o HTT foi acrescentado. Filtro de confiança ≥ 0,7: 66 proteínas e 207 interações. <a data-repo="analise/baixar_string.py">baixar_string.py</a> · <a data-repo="analise/string_htt_score700.tsv">dados brutos (TSV)</a></li>
+    <li><b>Estrutura.</b> Grau, betweenness, agrupamento, caminho médio, diâmetro, pontos de articulação e modularidade (grupos funcionais e Louvain). <a data-repo="analise/analise_robustez.py">analise_robustez.py</a> · <a data-repo="analise/saida/nos_metricas.csv">nos_metricas.csv</a></li>
+    <li><b>Robustez.</b> Removemos nós ao acaso (200 repetições), por grau e por betweenness, medindo o maior componente e a eficiência global. Resultado: robusta ao acaso, frágil às pontes (SLC1A2, PPARGC1A, HTT). <a data-repo="analise/saida/robustez_curvas.csv">robustez_curvas.csv</a> · <a data-repo="analise/saida/tabela_alvos.csv">tabela_alvos.csv</a></li>
+    <li><b>Cascata.</b> Modelo de limiar: um nó falha com a fração φ de vizinhos falhos; testamos φ de 0,2 a 0,5 com todas as sementes. Em φ = 0,2 a média é de 19,9 nós e o HTT derruba os 66. <a data-repo="analise/saida/cascata_resumo.csv">cascata_resumo.csv</a></li>
+    <li><b>Solução.</b> Repetimos a cascata com k nós protegidos (que não falham), comparando proteção aleatória, por grau, por betweenness e escolha gulosa. Proteger 5 hubs reduz 66% a cascata, contra 17% com 5 aleatórios; só o HDAC1 reduz 27%. <a data-repo="analise/protecao.py">protecao.py</a> · <a data-repo="analise/saida/protecao_resultados.csv">protecao_resultados.csv</a></li>
+    <li><b>Small-world e escala.</b> Comparamos C e L com 300 redes aleatórias (Erdős–Rényi e com os mesmos graus). <a data-repo="analise/exportar_site.py">exportar_site.py</a></li>
+    <li><b>Validação.</b> A rede foi calculada no Cytoscape e depois em Python e os números coincidiram. Esta página recalcula tudo no navegador: abra o console e confira que ela reproduz 19,9 → 6,8 nós (−66%).</li>
+  </ol>
+  <p class="downloads"><a data-repo="" id="lkRepo">Repositório completo</a> · <a data-repo="relatorio/main.tex">relatório (LaTeX)</a> · <a data-repo="README.md">README</a></p>
+</section>
+
+<!-- ============ CONCEITOS ============ -->
+<section id="conceitos">
+  <h2>Conceitos, interpretação biológica e limites</h2>
+  <div class="grid2" id="glossario"></div>
+
+  <h3 class="sub">Módulos da rede e a fisiologia por trás</h3>
+  <div class="tablewrap"><table class="fis" id="tabFis"></table></div>
+
+  <h3 class="sub">Limites do trabalho</h3>
+  <ul class="limites">
+    <li><b>Ganho de função tóxico.</b> A mutação do HTT age principalmente criando uma proteína tóxica. Remover o HTT na rede testa a dependência da rede, não reproduz a doença.</li>
+    <li><b>PPI sem direção nem sinal.</b> A rede não diz quem ativa ou inibe quem; só que há associação funcional.</li>
+    <li><b>O limiar φ é uma suposição.</b> Por isso variamos φ e mostramos a sensibilidade.</li>
+    <li><b>Rede pequena.</b> Com 66 nós não afirmamos que a rede é livre de escala; o ajuste da lei de potência é instável.</li>
+    <li><b>Sem validação experimental.</b> Os alvos são hipóteses para investigação.</li>
+  </ul>
+
+  <h3 class="sub">Dados e métodos</h3>
+  <p>Proteínas do mapa KEGG <i>hsa05016</i> (7 grupos); interações do STRING (<i>Homo sapiens</i>, pontuação ≥ 0,7), consultadas em 13 e 14 de novembro de 2026: 66 proteínas e 207 interações. Análises em Python (networkx); layout no Cytoscape. Tudo é calculado de novo no navegador nesta página.</p>
+  <p class="downloads">Baixar dados:
+    <a href="data/nos_metricas.csv" download>nós e métricas</a> ·
+    <a href="data/tabela_alvos.csv" download>alvos candidatos</a> ·
+    <a href="data/modulos_tabela.csv" download>módulos</a> ·
+    <a href="data/protecao_resultados.csv" download>proteção</a> ·
+    <a href="data/dados.json" download>tudo em JSON</a>
+  </p>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">Projeto de Introdução à Biologia de Sistemas · UNIFESP · Prof. André Zelanis · Vinícius e Marcos. Fontes: KEGG, STRING, GeneReviews. Exercício acadêmico, sem fins clínicos.</div>
+</footer>
+
+<script src="vendor/d3.min.js"></script>
+<script>window.REPO_URL = "https://github.com/vimassaru/huntington-rede";</script>
+<script src="data/dados.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
