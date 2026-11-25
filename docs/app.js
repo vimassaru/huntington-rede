@@ -97,6 +97,44 @@
   function shuffle(a, rnd = Math.random) { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
   const porGrau = ids.slice().sort((a, b) => byId.get(b).grau - byId.get(a).grau || byId.get(b).btw - byId.get(a).btw);
   const porBtw = ids.slice().sort((a, b) => byId.get(b).btw - byId.get(a).btw);
+  /* ataque adaptativo (igual ao analise_robustez.py): a cada passo recalcula grau ou betweenness
+     na rede que sobrou e remove o maior; empate -> maior id (mesma regra do max(key=(valor, n)) do Python) */
+  function btwRest(removed) {
+    const cb = new Map(ids.map(i => [i, 0]));
+    for (const s of ids) {
+      if (removed.has(s)) continue;
+      const S = [], P = new Map(), sig = new Map([[s, 1]]), dist = new Map([[s, 0]]), q = [s];
+      for (let i = 0; i < q.length; i++) {
+        const v = q[i]; S.push(v);
+        for (const w of adj.get(v)) {
+          if (removed.has(w)) continue;
+          if (!dist.has(w)) { dist.set(w, dist.get(v) + 1); q.push(w); }
+          if (dist.get(w) === dist.get(v) + 1) { sig.set(w, (sig.get(w) || 0) + sig.get(v)); (P.get(w) || P.set(w, []).get(w)).push(v); }
+        }
+      }
+      const delta = new Map();
+      while (S.length) {
+        const w = S.pop();
+        for (const v of P.get(w) || []) delta.set(v, (delta.get(v) || 0) + sig.get(v) / sig.get(w) * (1 + (delta.get(w) || 0)));
+        if (w !== s) cb.set(w, cb.get(w) + (delta.get(w) || 0));
+      }
+    }
+    return cb;
+  }
+  function ordemAdaptativa(metrica) {
+    const removed = new Set(), ordem = [];
+    while (removed.size < N) {
+      const val = metrica === "btw" ? btwRest(removed) : new Map(ids.map(i => [i, [...adj.get(i)].filter(v => !removed.has(v)).length]));
+      let best = null;
+      for (const i of ids) {
+        if (removed.has(i)) continue;
+        if (best === null || val.get(i) > val.get(best) + 1e-9 || (Math.abs(val.get(i) - val.get(best)) <= 1e-9 && i > best)) best = i;
+      }
+      removed.add(best); ordem.push(best);
+    }
+    return ordem;
+  }
+  const ataqueGrau = ordemAdaptativa("grau"), ataqueBtw = ordemAdaptativa("btw");
   const GULOSA = {}; D.protecao.forEach(r => { if (r.gulosa_nos) GULOSA[r.phi] = r.gulosa_nos.split(" "); });
   GULOSA[0.2] = GULOSA[0.2] || [];
 
@@ -181,7 +219,7 @@
 
   /* ---------- 2. ataque ---------- */
   let removidos = new Set(), ordemRand = shuffle(ids);
-  function ordemAtaque() { const e = $("#aEstrat").value; return e === "grau" ? porGrau : e === "btw" ? porBtw : ordemRand; }
+  function ordemAtaque() { const e = $("#aEstrat").value; return e === "grau" ? ataqueGrau : e === "btw" ? ataqueBtw : ordemRand; }
   function aplicaAtaque() {
     if ($("#aEstrat").value !== "manual") removidos = new Set(ordemAtaque().slice(0, +$("#aK").value));
     atualizaAtaque();
@@ -205,7 +243,7 @@
   $("#aZera").onclick = () => { $("#aK").value = 0; removidos = new Set(); $("#aEstrat").value = "random"; atualizaAtaque(); };
   // curvas
   const KMAX = 30, curvaDet = o => { const r = [1]; for (let k = 1; k <= KMAX; k++) r.push(lccAndEff(new Set(o.slice(0, k))).lcc); return r; };
-  const cG = curvaDet(porGrau), cB = curvaDet(porBtw);
+  const cG = curvaDet(ataqueGrau), cB = curvaDet(ataqueBtw);
   const cR = Array(KMAX + 1).fill(0); for (let t = 0; t < 200; t++) { const o = shuffle(ids); for (let k = 0; k <= KMAX; k++) cR[k] += (k ? lccAndEff(new Set(o.slice(0, k))).lcc : 1) / 200; }
   const chA = d3.select("#chAtaque");
   const xa = d3.scaleLinear([0, KMAX], [55, 880]), ya = d3.scaleLinear([0, 1], [275, 15]);
